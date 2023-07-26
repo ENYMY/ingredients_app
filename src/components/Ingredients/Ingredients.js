@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import classes from "./Ingredients.module.css";
 import ErrorModal from "../UI/ErrorModal";
 import IngredientForm from "./IngredientForm";
+import Search from "./Search";
 
 const Ingredients = () => {
   const [userIngredients, setUserIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
+
   const closeError = () => {
     setError(null);
   };
@@ -33,6 +35,10 @@ const Ingredients = () => {
       });
   };
 
+  const filteredIngredientsHandler = useCallback((filteredIngredients) => {
+    setUserIngredients(filteredIngredients);
+  }, []);
+
   useEffect(() => {
     // setIsLoading(false);
     console.log(userIngredients);
@@ -42,7 +48,7 @@ const Ingredients = () => {
       {error && <ErrorModal onClose={closeError}>{error}</ErrorModal>}
       <IngredientForm loading={isLoading} onAddIngredient={addIngredients} />
       <section>
-        {/* <Search /> */}
+        <Search onLoadIngredients={filteredIngredientsHandler} />
         {/* <IngredientLists /> */}
       </section>
     </div>
