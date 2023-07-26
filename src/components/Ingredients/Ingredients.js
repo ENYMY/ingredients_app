@@ -13,14 +13,29 @@ const Ingredients = () => {
 
   const addIngredients = (ingredients) => {
     setIsLoading(true);
-    setUserIngredients((prevIngredients) => [
-      ...prevIngredients,
-      { id: Math.random().toString(), ...ingredients },
-    ]);
+    fetch(
+      "https://ingredients-app-774b8-default-rtdb.firebaseio.com/ingredients.json",
+      {
+        method: "POST",
+        body: JSON.stringify(ingredients),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((response) => {
+        setIsLoading(false);
+        return response.json();
+      })
+      .then((res) => {
+        setUserIngredients((prevIngredients) => [
+          ...prevIngredients,
+          { id: res.name, ...ingredients },
+        ]);
+      });
   };
 
   useEffect(() => {
-    setIsLoading(false);
+    // setIsLoading(false);
+    console.log(userIngredients);
   }, [userIngredients]);
   return (
     <div className={classes.app}>
