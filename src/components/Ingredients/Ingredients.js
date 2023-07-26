@@ -3,6 +3,7 @@ import classes from "./Ingredients.module.css";
 import ErrorModal from "../UI/ErrorModal";
 import IngredientForm from "./IngredientForm";
 import Search from "./Search";
+import IngredientList from "./IngredientList";
 
 const Ingredients = () => {
   const [userIngredients, setUserIngredients] = useState([]);
@@ -39,6 +40,26 @@ const Ingredients = () => {
     setUserIngredients(filteredIngredients);
   }, []);
 
+  const removeItemHandler = (ingredientId) => {
+    setIsLoading(true);
+    fetch(
+      `https://ingredients-app-774b8-default-rtdb.firebaseio.com/${ingredientId}.json`,
+      {
+        method: "DELETE",
+      }
+    )
+      .then((response) => {
+        setIsLoading(false);
+        setUserIngredients((prevIngredients) =>
+          prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
+        );
+      })
+      .catch((error) => {
+        setError("Something went wrong!");
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     // setIsLoading(false);
     console.log(userIngredients);
@@ -49,7 +70,10 @@ const Ingredients = () => {
       <IngredientForm loading={isLoading} onAddIngredient={addIngredients} />
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
-        {/* <IngredientLists /> */}
+        <IngredientList
+          ingredients={userIngredients}
+          onRemoveItem={removeItemHandler}
+        />
       </section>
     </div>
   );
