@@ -20,18 +20,37 @@ const ingredientReducer = (currentIngredients, action) => {
   }
 };
 
+const httpReducer = (currentHttp, action) => {
+  switch (action.type) {
+    case "SEND":
+      return { loading: true, error: null };
+    case "RESPONSE":
+      return { ...currentHttp, loading: false };
+    case "ERROR":
+      return { loading: false, error: action.error };
+    case "CLEAR":
+      return { ...currentHttp, error: null };
+    default:
+  }
+};
+
 const Ingredients = () => {
   // const [userIngredients, setUserIngredients] = useState([]);
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
-
+  const [httpState, dispatchHttp] = useReducer(httpReducer, {
+    loading: false,
+    error: null,
+  });
   const closeError = () => {
-    setError(null);
+    // setError(null);
+    dispatchHttp({ type: "CLEAR" });
   };
 
   const addIngredients = (ingredients) => {
-    setIsLoading(true);
+    // setIsLoading(true);
+    dispatchHttp({ type: "SEND" });
     fetch(
       "https://ingredients-app-774b8-default-rtdb.firebaseio.com/ingredients.json",
       {
@@ -41,7 +60,8 @@ const Ingredients = () => {
       }
     )
       .then((response) => {
-        setIsLoading(false);
+        // setIsLoading(false);
+        dispatchHttp({ type: "RESPONSE" });
         return response.json();
       })
       .then((res) => {
@@ -59,7 +79,8 @@ const Ingredients = () => {
   }, []);
 
   const removeItemHandler = (ingredientId) => {
-    setIsLoading(true);
+    // setIsLoading(true);
+    dispatchHttp({ type: "SEND" });
     console.log(ingredientId);
     fetch(
       `https://ingredients-app-774b8-default-rtdb.firebaseio.com/${ingredientId}.json`,
@@ -68,15 +89,17 @@ const Ingredients = () => {
       }
     )
       .then((response) => {
-        setIsLoading(false);
+        // setIsLoading(false);
+        dispatchHttp({ type: "RESPONSE" });
         // setUserIngredients((prevIngredients) =>
         //   prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
         // );
         dispatch({ type: "DELETE", id: ingredientId });
       })
       .catch((error) => {
-        setError("Something went wrong!");
-        setIsLoading(false);
+        // setError("Something went wrong!");
+        // setIsLoading(false);
+        dispatchHttp({ type: "ERROR", error: "Something went Wrong" });
       });
   };
 
