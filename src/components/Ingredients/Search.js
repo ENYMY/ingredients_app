@@ -12,7 +12,7 @@ const Search = (props) => {
         const query =
           enteredFilter.length === 0
             ? ""
-            : `?orderBy="title"&equalTo="${enteredFilter}"`;
+            : `?orderBy="title"&startAt="${enteredFilter}"`;
         fetch(
           "https://ingredients-app-774b8-default-rtdb.firebaseio.com/ingredients.json" +
             query
