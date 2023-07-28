@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import classes from "./Search.module.css";
 import Card from "../UI/Card";
-const Search = (props) => {
+const Search = React.memo((props) => {
   const { onLoadIngredients } = props;
   const [enteredFilter, setEnteredFilter] = useState("");
   const inputRef = useRef();
@@ -52,6 +52,6 @@ const Search = (props) => {
       </Card>
     </section>
   );
-};
+});
 
 export default Search;
