@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import classes from "./Search.module.css";
 import Card from "../UI/Card";
+import useHttp from "../../hooks/http";
 const Search = React.memo((props) => {
   const { onLoadIngredients } = props;
   const [enteredFilter, setEnteredFilter] = useState("");
   const inputRef = useRef();
+  const { isLoading, data, error, sendRequest, clear } = useHttp();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -13,28 +15,47 @@ const Search = React.memo((props) => {
           enteredFilter.length === 0
             ? ""
             : `?orderBy="title"&startAt="${enteredFilter}"`;
-        fetch(
+        // fetch(
+        //   "https://ingredients-app-774b8-default-rtdb.firebaseio.com/ingredients.json" +
+        //     query
+        // )
+        //   .then((response) => response.json())
+        //   .then((resData) => {
+        //     const loadedIngredients = [];
+        //     for (const key in resData) {
+        //       loadedIngredients.push({
+        //         id: key,
+        //         title: resData[key].title,
+        //         amount: resData[key].amount,
+        //       });
+        //       onLoadIngredients(loadedIngredients);
+        //     }
+        //   });
+        sendRequest(
           "https://ingredients-app-774b8-default-rtdb.firebaseio.com/ingredients.json" +
-            query
-        )
-          .then((response) => response.json())
-          .then((resData) => {
-            const loadedIngredients = [];
-            for (const key in resData) {
-              loadedIngredients.push({
-                id: key,
-                title: resData[key].title,
-                amount: resData[key].amount,
-              });
-              onLoadIngredients(loadedIngredients);
-            }
-          });
+            query,
+          "GET"
+        );
       }
     }, 500);
     return () => {
       clearTimeout(timer);
     };
-  }, [enteredFilter, inputRef, onLoadIngredients]);
+  }, [enteredFilter, inputRef, sendRequest]);
+
+  useEffect(() => {
+    if (!isLoading && !error && data) {
+      const loadedIngredients = [];
+      for (const key in data) {
+        loadedIngredients.push({
+          id: key,
+          title: data[key].title,
+          amount: data[key].amount,
+        });
+      }
+      onLoadIngredients(loadedIngredients);
+    }
+  }, [isLoading, data, error, onLoadIngredients]);
   return (
     <section className={classes.search}>
       <Card>
